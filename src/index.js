@@ -252,15 +252,15 @@ class App extends React.Component {
 
     return (
       <div className="App" >
-        React - Sora Labo example<br />
-        Video Codec:
-        { /*<select value={this.state.videoCodec} onChange={this.handleCodecChange} disabled={this.state.connected} >
+        React - Skyway example<br />
+        { /*Video Codec:
+        <select value={this.state.videoCodec} onChange={this.handleCodecChange} disabled={this.state.connected} >
           <option value="VP8">VP8</option>
           <option value="VP9">VP9</option>
           <option value="H264">H264</option>
           <option value="H265">H265</option>
-        </select>*/ }
-        &nbsp;
+        </select>
+        &nbsp;*/ }
         <button onClick={this.startVideo} disabled={this.state.playing || this.state.connected}> Start Video</button >
         <button onClick={this.stopVideo} disabled={!this.state.playing || this.state.connected}>Stop Video</button>
         <br />
