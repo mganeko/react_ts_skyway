@@ -60,7 +60,7 @@ class App extends React.Component {
       connected: false,
       roomId: roomId,
       signalingKey: signalingKey,
-      videoCodec: 'VP9',
+      //videoCodec: 'VP9',
       remoteStreams: {},
     };
 
@@ -71,7 +71,7 @@ class App extends React.Component {
     this.disconnect = this.disconnect.bind(this);
     this.handleRoomChange = this.handleRoomChange.bind(this);
     this.handleKeyChange = this.handleKeyChange.bind(this);
-    this.handleCodecChange = this.handleCodecChange.bind(this);
+    //this.handleCodecChange = this.handleCodecChange.bind(this);
     this.addRemoteStream = this.addRemoteStream.bind(this);
     this.removeRemoteStream = this.removeRemoteStream.bind(this);
     this.removeAllRemoteStream = this.removeAllRemoteStream.bind(this);
@@ -120,14 +120,6 @@ class App extends React.Component {
     }
   }
 
-  // const metadata = {
-  //   signaling_key: "jGTYhHBYhIF0IvzTTvPub0aO8qsmshksqACOCou2GrcOSNTa"
-  // };
-  // const options = {
-  //   multistream: true
-  // };
-  // const publisher = sora.publisher(channelId, metadata, options);
-
   // -----------------
   connect(e) {
     e.preventDefault();
@@ -137,20 +129,15 @@ class App extends React.Component {
       return;
     }
 
-    // const metadata = {
-    //   signaling_key: this.state.signalingKey
+    // const options = {
+    //   audio: true,
+    //   multistream: true,
+    //   video: true,
+    //   videoCodecType: this.state.videoCodec,
+    //   videoBitRate: 1000,
     // };
-    const options = {
-      audio: true,
-      multistream: true,
-      video: true,
-      videoCodecType: this.state.videoCodec,
-      videoBitRate: 1000,
-    };
-    //const app = this;
-    //console.log('app:', app);
 
-    console.log('connecting roomId=%s codec=%s key=%s', this.state.roomId, options.videoCodecType, this.state.signalingKey);
+    console.log('connecting roomId=%s key=%s', this.state.roomId, this.state.signalingKey);
     this.peer = new Peer({
       key: this.state.signalingKey,
       debug: debug
@@ -160,52 +147,6 @@ class App extends React.Component {
       this.joinRoom();
     });
     this.peer.on('error', console.error);
-
-    // const room = this.peer.joinRoom(roomId.value, {
-    //   mode: 'sfu',
-    //   stream: this.localStream,
-    // });
-    // room.once('open', () => {
-    //   console.log('room open');
-    // });
-    // room.on('peerJoin', peerId => {
-    //   console.log(`= new Peer id=${peerId} joined ===`)
-    // });
-
-
-
-    // this.publisher = sora.publisher(this.state.roomId, metadata, options);
-    // this.publisher.on('addstream', function (event) {
-    //   console.log('addstream id=%s', event.stream.id);
-
-    //   // --- for multi stream ---
-    //   const id = 'remote_' + event.stream.id;
-    //   app.addRemoteStream(id, event.stream);
-    // });
-
-    // this.publisher.on('removestream', function (event) {
-    //   console.log('removestream id=%s', event.stream.id);
-
-    //   // --- for multi stream ---
-    //   const id = 'remote_' + event.stream.id;
-    //   app.removeRemoteStream(id);
-    // });
-
-    // this.publisher.on('disconnect', e => {
-    //   console.log('sora disconnected:', e);
-    //   this.handleDisconnect()
-    // });
-
-    // this.publisher.connect(this.localStream)
-    //   .then(() => {
-    //     console.log('sora connected');
-    //     app.setState({ connected: true });
-    //   })
-    //   .catch(err => {
-    //     console.error('sora connect ERROR:', err);
-    //     this.publisher = null;
-    //     this.setState({ connected: false });
-    //   });
   }
 
   joinRoom() {
@@ -274,9 +215,9 @@ class App extends React.Component {
     this.setState({ signalingKey: e.target.value });
   }
 
-  handleCodecChange(e) {
-    this.setState({ videoCodec: e.target.value });
-  }
+  // handleCodecChange(e) {
+  //   this.setState({ videoCodec: e.target.value });
+  // }
 
   addRemoteStream(id, stream) {
     const clonedStreams = Object.assign({}, this.state.remoteStreams);
@@ -313,12 +254,12 @@ class App extends React.Component {
       <div className="App" >
         React - Sora Labo example<br />
         Video Codec:
-        <select value={this.state.videoCodec} onChange={this.handleCodecChange} disabled={this.state.connected} >
+        { /*<select value={this.state.videoCodec} onChange={this.handleCodecChange} disabled={this.state.connected} >
           <option value="VP8">VP8</option>
           <option value="VP9">VP9</option>
           <option value="H264">H264</option>
           <option value="H265">H265</option>
-        </select>
+        </select>*/ }
         &nbsp;
         <button onClick={this.startVideo} disabled={this.state.playing || this.state.connected}> Start Video</button >
         <button onClick={this.stopVideo} disabled={!this.state.playing || this.state.connected}>Stop Video</button>
@@ -334,10 +275,6 @@ class App extends React.Component {
           </Video>
           <div className="RemoteContainer">
             {remoteVideos}
-            { /*
-            <Video id={"remote_video"} width={"320px"} height={"240px"} volume={0.5} controls={true} stream={this.remoteStream1}>
-            </Video>
-            */ }
           </div>
         </div>
       </div >
