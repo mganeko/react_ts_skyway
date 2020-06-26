@@ -256,18 +256,13 @@ class App extends React.Component {
       this.room.close();
       this.room = null;
     }
-    // if (this.publisher) {
-    //   this.publisher.disconnect();
-    //   // localStream will be stoped
-    //   this.publisher = null;
-    //   this.localStream = null;
-    //   this.setState({ playing: false });
-    // }
+    if (this.localStream) {
+      this.localStream.getTracks().forEach(track => track.stop());
+      this.localStream = null;
+      this.setState({ playing: false });
+    }
 
     this.removeAllRemoteStream();
-
-    //this.remoteStream1 = null;
-    //this.setState({ connected: false, gotRemoteStream: false });
     this.setState({ connected: false });
   }
 
