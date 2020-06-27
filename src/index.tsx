@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import Video from './video'; // video.js
 import Peer from 'skyway-js';
+import { MouseEvent } from 'react';
 
 import './index.css';
 
@@ -24,7 +25,7 @@ if (keyFromUrl && (keyFromUrl !== '')) {
 }
 
 // ---- URL ----
-function getRoomFromUrl() {
+function getRoomFromUrl(): string {
   const search = window.location.search;
   const re = new RegExp('room=([^&=]+)');
   const results = re.exec(search);
@@ -35,7 +36,7 @@ function getRoomFromUrl() {
   return room;
 }
 
-function getKeyFromUrl() {
+function getKeyFromUrl(): string | null {
   const search = window.location.search;
   const re = new RegExp('key=([^&=]+)');
   const results = re.exec(search);
@@ -49,12 +50,31 @@ function getKeyFromUrl() {
 // --- Skyway -----
 const debug = 2;
 
+interface SkywayMediaStream extends MediaStream {
+  peerId: string;
+}
+
+
+
 // ------ App class ------
+interface SkywayAppStateInterface {
+  playing: boolean;
+  connected: boolean;
+  roomId: string;
+  signalingKey: string;
+  //videoCodec: VideoCodecType;
+  remoteStreams: { [key: string]: SkywayMediaStream; }
+}
+
 class App extends React.Component {
-  constructor(props) {
+  localStream: MediaStream | null;
+  room: any;
+  peer: any;
+  state: SkywayAppStateInterface;
+
+  constructor(props: object) {
     super(props);
     this.localStream = null;
-    this.room = null;
     this.state = {
       playing: false,
       connected: false,
@@ -66,6 +86,7 @@ class App extends React.Component {
 
     // This binding is necessary to make `this` work in the callback
     this.startVideo = this.startVideo.bind(this);
+    this.stopVideoHandler = this.stopVideoHandler.bind(this);
     this.stopVideo = this.stopVideo.bind(this);
     this.connect = this.connect.bind(this);
     this.disconnect = this.disconnect.bind(this);
@@ -77,8 +98,8 @@ class App extends React.Component {
     this.removeAllRemoteStream = this.removeAllRemoteStream.bind(this);
 
     // -- Skyway connection --
+    this.room = null;
     this.peer = null;
-    //this.remoteStream1 = null;
   }
 
   componentDidMount() {
@@ -93,7 +114,7 @@ class App extends React.Component {
   }
 
   // -----------
-  startVideo(e) {
+  startVideo(e: MouseEvent<HTMLButtonElement>) {
     e.preventDefault();
     console.log('start Video');
     if (this.localStream) {
@@ -110,9 +131,13 @@ class App extends React.Component {
       .catch(err => console.error('media ERROR:', err));
   }
 
-  stopVideo(e) {
+  stopVideoHandler(e: MouseEvent<HTMLButtonElement>) {
     e.preventDefault();
     console.log('stop Video');
+    this.stopVideo();
+  }
+
+  stopVideo() {
     if (this.localStream) {
       this.localStream.getTracks().forEach(track => track.stop());
       this.localStream = null;
@@ -121,10 +146,10 @@ class App extends React.Component {
   }
 
   // -----------------
-  connect(e) {
+  connect(e: MouseEvent<HTMLButtonElement>) {
     e.preventDefault();
     console.log('connect');
-    if (this.publisher) {
+    if (this.room) {
       console.warn('ALREADY connected');
       return;
     }
@@ -158,11 +183,11 @@ class App extends React.Component {
       console.log('room open');
       this.setState({ connected: true });
     });
-    room.on('peerJoin', peerId => {
+    room.on('peerJoin', (peerId: string) => {
       console.log(`= new Peer id=${peerId} joined ===`)
     });
 
-    room.on('stream', stream => {
+    room.on('stream', (stream: SkywayMediaStream) => {
       console.log('addstream id=%s', stream.id, stream.peerId);
 
       // --- for multi stream ---
@@ -170,7 +195,7 @@ class App extends React.Component {
       this.addRemoteStream(id, stream);
     });
 
-    room.on('peerLeave', peerId => {
+    room.on('peerLeave', (peerId: string) => {
       console.log('peerLeave peerId=%s', peerId);
 
       // --- for multi stream ---
@@ -186,7 +211,7 @@ class App extends React.Component {
     this.room = room;
   }
 
-  disconnect(e) {
+  disconnect(e: MouseEvent<HTMLButtonElement>) {
     e.preventDefault();
     console.log('disconnect');
     this.handleDisconnect();
@@ -207,11 +232,11 @@ class App extends React.Component {
     this.setState({ connected: false });
   }
 
-  handleRoomChange(e) {
+  handleRoomChange(e: React.ChangeEvent<HTMLInputElement>) {
     this.setState({ roomId: e.target.value });
   }
 
-  handleKeyChange(e) {
+  handleKeyChange(e: React.ChangeEvent<HTMLInputElement>) {
     this.setState({ signalingKey: e.target.value });
   }
 
@@ -219,13 +244,13 @@ class App extends React.Component {
   //   this.setState({ videoCodec: e.target.value });
   // }
 
-  addRemoteStream(id, stream) {
+  addRemoteStream(id: string, stream: SkywayMediaStream) {
     const clonedStreams = Object.assign({}, this.state.remoteStreams);
     clonedStreams[id] = stream;
     this.setState({ remoteStreams: clonedStreams });
   }
 
-  removeRemoteStream(id, stream) {
+  removeRemoteStream(id: string) {
     const clonedStreams = Object.assign({}, this.state.remoteStreams);
     delete clonedStreams[id];
     this.setState({ remoteStreams: clonedStreams });
@@ -240,9 +265,10 @@ class App extends React.Component {
   render() {
     console.log('App render()');
 
-    const remoteVideos = [];
-    Object.keys(this.state.remoteStreams).forEach(function (key) {
-      const stream = this[key]; // this は this.state.remoteStream
+    const remoteVideos: JSX.Element[] = [];
+    //Object.keys(this.state.remoteStreams).forEach(function (key) {
+    Object.keys(this.state.remoteStreams).forEach(function (this: { [key: string]: SkywayMediaStream; }, key: string) {
+      const stream: SkywayMediaStream = this[key]; // this は this.state.remoteStream
       console.log('key=id=%s, stream.id=%s', key, stream.id);
       remoteVideos.push(
         <Video id={key} key={key} width={"320px"} height={"240px"} volume={0.5} controls={true} stream={stream}>
@@ -264,7 +290,7 @@ class App extends React.Component {
         <button onClick={this.startVideo} disabled={this.state.playing || this.state.connected}> Start Video</button >
         <button onClick={this.stopVideo} disabled={!this.state.playing || this.state.connected}>Stop Video</button>
         <br />
-        SignalingKey: <input id="signaling_key" type="text" size="32" value={this.state.signalingKey} onChange={this.handleKeyChange} disabled={this.state.connected}></input>
+        SignalingKey: <input id="signaling_key" type="text" size={32} value={this.state.signalingKey} onChange={this.handleKeyChange} disabled={this.state.connected}></input>
         <br />
         Room: <input id="room_id" type="text" value={this.state.roomId} onChange={this.handleRoomChange} disabled={this.state.connected}></input>
         <button onClick={this.connect} disabled={this.state.connected || !this.state.playing}> Connect</button >
