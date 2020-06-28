@@ -1,44 +1,52 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+# React.js/TypeScript - SkyWay Example
 
-## Available Scripts
+React.js and TypeScript exmaple for [SkyWay](https://webrtc.ecl.ntt.com).
 
-In the project directory, you can run:
+これは WebRTCクラウドプラットフォーム [SkyWay](https://webrtc.ecl.ntt.com) 向けの、React.js/TypeScript によるサンプルです。
 
-### `npm start`
+- [skyway-js-sdk](https://github.com/skyway/skyway-js-sdk) を利用しています(Apache 2.0 ライセンス)
 
-Runs the app in the development mode.<br />
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+## LICENSE / ライセンス
 
-The page will reload if you make edits.<br />
-You will also see any lint errors in the console.
+- MIT LICENSE / MITライセンス
 
-### `npm test`
 
-Launches the test runner in the interactive watch mode.<br />
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+# 利用方法
 
-### `npm run build`
+## 事前準備
 
-Builds the app for production to the `build` folder.<br />
-It correctly bundles React in production mode and optimizes the build for the best performance.
+- [SkyWay](https://webrtc.ecl.ntt.com) にサインアップ
+- APIキーを取得
 
-The build is minified and the filenames include the hashes.<br />
-Your app is ready to be deployed!
+## GitHub Pages で実行（準備中）
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+- ブラウザを2つ起動、それぞれ https://mganeko.github.io/react_ts_skyway/ にアクセス
+- [Start Video]ボタンをクリック
+- API Key: に SkyWayのAPIキーを入力
+- Room: にルーム名を入力
+- [Coonect]ボタンをクリックして接続
 
-### `npm run eject`
+URLを次の形式で指定することで、シグナリングキーとルーム名を指定可能
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+- https://mganeko.github.io/react_ts_skyway/?room=ルーム名&key=APIキー
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+## 開発環境で実行
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+- $ git clone https://github.com/mganeko/react_ts_skyway.git
+- $ cd react_ts_skyway
+- $ npm install 
+- $ npm start
+- http:localhost:3000 にブラウザでアクセス
+- その後は GitHub Pages の例と同様 
 
-## Learn More
+## 自分のサーバーで実行
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+- $ git clone https://github.com/mganeko/react_ts_skyway.git
+- $ cd react_ts_skyway
+- $ npm install 
+- $ npm run build
+- build/ 以下をWebサーバーに配置(要https)
+- 配置したWebサーバーにブラウザーでアクセス
+- その後は GitHub Pages の例と同様 
 
-To learn React, check out the [React documentation](https://reactjs.org/).
